@@ -31,7 +31,12 @@ class SystemeEmprunt {
 		camion = new Camion(sites);
 
     /* Démarrage du camion et des clients */
-    /* TODO */
+
+		camion.start();
+
+		for (Client cl: clients) {
+			cl.start();
+		}
   }
 
   public static void main(String[] args) {
