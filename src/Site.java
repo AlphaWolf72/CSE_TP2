@@ -8,17 +8,19 @@ class Site {
     static final int BORNE_SUP = 8;
     static final int BORNE_INF = 2;
 
+    private boolean unCamion = false;
+
     private int idSite;
 
     private int stock;
 
     public Site(int idSite) {
         this.idSite = idSite;
-        this.stock = STOCK_INIT;
+        this.stock = 2;
     }
 
     public synchronized void emprunter() {
-        while (stock <= 0){
+        while (stock == 0 || unCamion){
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -31,7 +33,7 @@ class Site {
     }
 
     public synchronized void restituer() {
-        while (stock >= STOCK_MAX){
+        while (stock == STOCK_MAX || unCamion){
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -43,41 +45,53 @@ class Site {
         notifyAll();
     }
 
-    public synchronized int charger(int nb){
-        if(stock <= BORNE_SUP){
+    public synchronized void charger(Camion camion){
+        unCamion = true;
+        /*
+        if (stock < BORNE_SUP){
             try {
                 wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        int temp = stock;
-        stock = STOCK_INIT;
-        temp = temp - STOCK_INIT;
-        System.out.println("Le camion "+Thread.currentThread().getName()+" vient charger "+temp+" vélos du site " +idSite+" il reste "+stock+" vélos");
-        notifyAll();
-        return nb + (temp);
-    }
-
-    public synchronized int deposer(int nb){
-        if(stock <= BORNE_INF){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if(STOCK_INIT - stock <= nb){
+        */
+        if(stock >= BORNE_SUP){
             int temp = stock;
             stock = STOCK_INIT;
-            temp = (STOCK_INIT - temp);
-            System.out.println("Le camion "+Thread.currentThread().getName()+" vient deposer "+temp+" vélos au site " +idSite+" il y a "+stock+" vélos");
-            notifyAll();
-            return nb - temp;
-        }else{
-            stock += nb;
-            notifyAll();
-            return 0;
+            temp = temp - STOCK_INIT;
+            camion.setStock(camion.getStock() + temp);
+            System.out.println(" Le camion "+Thread.currentThread().getName()+" vient charger "+temp+" vélos du site " +idSite+" il reste "+stock+" vélos");
         }
+        unCamion = false;
+        notifyAll();
+    }
+
+    public synchronized void deposer(Camion camion) {
+        unCamion = true;
+        /*
+        if (stock > BORNE_INF){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        */
+        if(stock <= BORNE_INF){
+            int temp = stock;
+            if (STOCK_INIT - stock <= camion.getStock()) {
+                stock = STOCK_INIT;
+                temp = (STOCK_INIT - temp);
+                camion.setStock(camion.getStock() - temp);
+            } else {
+                stock += camion.getStock();
+                temp = (temp - camion.getStock());
+                camion.setStock(0);
+            }
+            System.out.println("Le camion " + Thread.currentThread().getName() + " vient deposer " + temp + " vélos au site " + idSite + " il y a " + stock + " vélos");
+        }
+        unCamion = false;
+        notifyAll();
     }
 }
