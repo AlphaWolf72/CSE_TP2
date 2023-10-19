@@ -1,22 +1,29 @@
-
 class Site {
+    // Codes ANSI pour la couleur du texte
+    String YELLOW = "\u001B[33m";
+    String BLUE = "\u001B[34m";
+    String RESET = "\u001B[0m"; // Réinitialisation de la couleur
 
     /* Constantes communes à tous les sites */
 
     static final int STOCK_INIT = 5;
-    static final int STOCK_MAX = 10;
+    static final int STOCK_MAX = 30;
     static final int BORNE_SUP = 8;
     static final int BORNE_INF = 2;
 
-    private boolean unCamion = false;
+    private static boolean unCamion = false;
 
-    private int idSite;
+    private final int idSite;
 
     private int stock;
 
     public Site(int idSite) {
         this.idSite = idSite;
-        this.stock = 2;
+        this.stock = STOCK_INIT;
+    }
+
+    public int getIdSite(){
+        return idSite;
     }
 
     public synchronized void emprunter() {
@@ -28,7 +35,7 @@ class Site {
             }
         }
         stock--;
-        System.out.println("Le client "+Thread.currentThread().getName()+" vient d'emprunter un vélo à "+idSite+" il reste "+stock+" vélos");
+        System.out.println("|"+BLUE+"\tClient\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\temprunter\t|\t1\t\t|\t"+idSite+"\t\t|\t"+stock+"\t\t|\t");
         notifyAll();
     }
 
@@ -41,27 +48,17 @@ class Site {
             }
         }
         stock++;
-        System.out.println("Le client "+Thread.currentThread().getName()+" vient restituer un vélo à "+idSite+" il y a "+stock+" vélos");
+        System.out.println("|"+BLUE+"\tClient\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\trestituter\t|\t1\t\t|\t"+idSite+"\t\t|\t"+stock+"\t\t|\t");
         notifyAll();
     }
 
     public synchronized void charger(Camion camion){
         unCamion = true;
-        /*
-        if (stock < BORNE_SUP){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        */
         if(stock >= BORNE_SUP){
-            int temp = stock;
+            int temp = stock - STOCK_INIT;
             stock = STOCK_INIT;
-            temp = temp - STOCK_INIT;
             camion.setStock(camion.getStock() + temp);
-            System.out.println(" Le camion "+Thread.currentThread().getName()+" vient charger "+temp+" vélos du site " +idSite+" il reste "+stock+" vélos");
+            System.out.println("|"+YELLOW+"\tCamion\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\tcharger\t\t|\t"+temp+"\t\t|\t" +idSite+"\t\t|\t"+stock+"\t\t|\t");
         }
         unCamion = false;
         notifyAll();
@@ -69,27 +66,18 @@ class Site {
 
     public synchronized void deposer(Camion camion) {
         unCamion = true;
-        /*
-        if (stock > BORNE_INF){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        */
         if(stock <= BORNE_INF){
-            int temp = stock;
-            if (STOCK_INIT - stock <= camion.getStock()) {
+            System.out.print("|"+YELLOW+"\tCamion\t"+RESET+"|\t" + Thread.currentThread().getName() + "\t|\tdeposer\t\t|\t");
+            if(STOCK_INIT - stock < camion.getStock()){
+                System.out.print(STOCK_INIT - stock);
+                camion.setStock(camion.getStock() - (STOCK_INIT-stock));
                 stock = STOCK_INIT;
-                temp = (STOCK_INIT - temp);
-                camion.setStock(camion.getStock() - temp);
-            } else {
+            }else{
+                System.out.print(camion.getStock());
                 stock += camion.getStock();
-                temp = (temp - camion.getStock());
                 camion.setStock(0);
             }
-            System.out.println("Le camion " + Thread.currentThread().getName() + " vient deposer " + temp + " vélos au site " + idSite + " il y a " + stock + " vélos");
+            System.out.println("\t\t|\t" + idSite + "\t\t|\t" + stock + "\t\t|\t");
         }
         unCamion = false;
         notifyAll();
