@@ -1,8 +1,8 @@
 class Site {
     // Codes ANSI pour la couleur du texte
-    String YELLOW = "\u001B[33m";
-    String BLUE = "\u001B[34m";
-    String RESET = "\u001B[0m"; // Réinitialisation de la couleur
+    private final String YELLOW = "\u001B[33m";
+    private final String BLUE = "\u001B[34m";
+    private final String RESET = "\u001B[0m"; // Réinitialisation de la couleur
 
     /* Constantes communes à tous les sites */
 
