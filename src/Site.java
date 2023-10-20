@@ -35,7 +35,7 @@ class Site {
             }
         }
         stock--;
-        System.out.println("|"+BLUE+"\tClient\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\temprunter\t|\t1\t\t|\t"+idSite+"\t\t|\t"+stock+"\t\t|\t");
+        System.out.println("|"+BLUE+"\tClient\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\temprunter\t|\t  1\t\t|\t  "+idSite+"\t\t|\t  "+stock+"\t\t|\t");
         notifyAll();
     }
 
@@ -48,7 +48,7 @@ class Site {
             }
         }
         stock++;
-        System.out.println("|"+BLUE+"\tClient\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\trestituter\t|\t1\t\t|\t"+idSite+"\t\t|\t"+stock+"\t\t|\t");
+        System.out.println("|"+BLUE+"\tClient\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\trestituter\t|\t  1\t\t|\t  "+idSite+"\t\t|\t  "+stock+"\t\t|\t");
         notifyAll();
     }
 
@@ -58,7 +58,7 @@ class Site {
             int temp = stock - STOCK_INIT;
             stock = STOCK_INIT;
             camion.setStock(camion.getStock() + temp);
-            System.out.println("|"+YELLOW+"\tCamion\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\tcharger\t\t|\t"+temp+"\t\t|\t" +idSite+"\t\t|\t"+stock+"\t\t|\t");
+            System.out.println("|"+YELLOW+"\tCamion\t"+RESET+"|\t"+Thread.currentThread().getName()+"\t|\tcharger\t\t|\t  "+temp+"\t\t|\t  " +idSite+"\t\t|\t  "+stock+"\t\t|\t");
         }
         unCamion = false;
         notifyAll();
@@ -67,7 +67,7 @@ class Site {
     public synchronized void deposer(Camion camion) {
         unCamion = true;
         if(stock <= BORNE_INF){
-            System.out.print("|"+YELLOW+"\tCamion\t"+RESET+"|\t" + Thread.currentThread().getName() + "\t|\tdeposer\t\t|\t");
+            System.out.print("|"+YELLOW+"\tCamion\t"+RESET+"|\t" + Thread.currentThread().getName() + "\t|\tdeposer\t\t|\t  ");
             if(STOCK_INIT - stock < camion.getStock()){
                 System.out.print(STOCK_INIT - stock);
                 camion.setStock(camion.getStock() - (STOCK_INIT-stock));
@@ -77,7 +77,7 @@ class Site {
                 stock += camion.getStock();
                 camion.setStock(0);
             }
-            System.out.println("\t\t|\t" + idSite + "\t\t|\t" + stock + "\t\t|\t");
+            System.out.println("\t\t|\t  " + idSite + "\t\t|\t  " + stock + "\t\t|\t");
         }
         unCamion = false;
         notifyAll();
